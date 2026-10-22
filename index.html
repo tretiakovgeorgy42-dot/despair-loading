@@ -1,0 +1,194 @@
+<!doctype html>
+<!--
+  Despair Syndrome loading screen (owner's design "despair-loading-1a", 2026-10-23),
+  rebuilt without its bundler and React so Garry's Mod can show it as sv_loadingurl.
+  Hosted on GitHub Pages; Garry's Mod calls GameDetails, SetFilesTotal, SetFilesNeeded,
+  DownloadingFile and SetStatusChanged while the player connects, and the bar follows the
+  real download. Opened in a browser, it plays the design's own demo progress.
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Despair Syndrome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&family=VT323&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+:root {
+  --acid-500: #39FF14; --acid-900: #073A02;
+  --phos-500: #8FD68A; --phos-700: #4F8A4B;
+  --despair-500: #FF2BD6;
+  --void: #000;
+  --font-display: "Press Start 2P", "VT323", ui-monospace, monospace;
+  --font-crt: "VT323", "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --glow-text: 0 0 4px var(--acid-500), 0 0 12px rgba(57,255,20,.55);
+  --glow-despair-text: 0 0 4px var(--despair-500), 0 0 14px rgba(255,43,214,.6);
+  --scanlines-soft: repeating-linear-gradient(0deg, rgba(0,0,0,0) 0 3px, rgba(0,0,0,.18) 3px 4px);
+  --vignette: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.75) 100%);
+  --grid-bg: linear-gradient(rgba(57,255,20,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,.08) 1px, transparent 1px);
+  --tone: var(--acid-500);
+  --tone-glow: var(--glow-text);
+}
+body.infected { --tone: var(--despair-500); --tone-glow: var(--glow-despair-text); }
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+@keyframes blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
+@keyframes ecg { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+.stage { position: absolute; left: 50%; top: 50%; width: 960px; height: 540px; margin: -270px 0 0 -480px;
+  overflow: hidden; background: #000 var(--grid-bg); background-size: 24px 24px; transform-origin: center; }
+.corner { position: absolute; left: 20px; right: 20px; display: flex; justify-content: space-between;
+  font: 11px/1.4 var(--font-mono); color: var(--phos-700); }
+.corner.top { top: 16px } .corner.bottom { bottom: 16px }
+.center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.term { width: 640px; display: flex; flex-direction: column; border: 1px solid var(--tone); background: var(--void);
+  font-family: var(--font-mono); color: var(--phos-500); position: relative; }
+.bar { display: flex; align-items: center; justify-content: space-between; background: var(--tone); color: var(--void);
+  padding: 0 10px; height: 24px; font: 8px var(--font-display); letter-spacing: .12em; text-transform: uppercase; }
+.body { position: relative; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.head { display: flex; justify-content: space-between; align-items: center; }
+.title { display: inline-flex; padding: 7.7px 9.9px; border: 1px solid var(--tone);
+  box-shadow: 0 0 0 1px var(--tone), 0 0 12px var(--tone); }
+.title div { font: 11px/1.2 var(--font-display); color: var(--tone); text-shadow: var(--tone-glow); letter-spacing: .04em; white-space: nowrap; }
+.blink { animation: blink 1s steps(1, end) infinite; }
+.patient { font: 9px/1 var(--font-display); letter-spacing: .12em; color: var(--phos-700); }
+.log { height: 155px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+  font: 13px/1.55 var(--font-mono); overflow: hidden; }
+.log div { white-space: pre; color: var(--phos-500); }
+.log div.bad { color: var(--despair-500); text-shadow: var(--glow-despair-text); }
+.ecg { position: relative; height: 48px; overflow: hidden; border-top: 1px solid var(--acid-900);
+  border-bottom: 1px solid var(--acid-900); }
+.ecg .label { position: absolute; left: 8px; top: 4px; font: 7px/1 var(--font-display); letter-spacing: .12em; color: var(--tone); }
+.ecg .hr { position: absolute; right: 8px; top: 4px; font: 14px/1 var(--font-crt); color: var(--tone); }
+.ecg svg { position: absolute; inset: 0; width: 200%; height: 100%; animation: ecg 3s linear infinite; }
+body.infected .ecg svg { animation-duration: 1.6s; }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.progress .name { min-width: 90px; font: 8px var(--font-display); letter-spacing: .12em; color: var(--tone); text-transform: uppercase; }
+.progress .cells { color: var(--tone); letter-spacing: 1px; text-shadow: var(--tone-glow); }
+.progress .pct { color: var(--tone); font: 20px/1 var(--font-crt); min-width: 44px; }
+.status { font: 11px/1.3 var(--font-mono); color: var(--phos-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 14px; }
+.foot { display: flex; justify-content: space-between; font: 11px/1 var(--font-mono); color: var(--phos-700); }
+.foot .key { color: var(--tone); }
+.scan { position: absolute; inset: 0; pointer-events: none; background: var(--scanlines-soft); }
+.vignette { position: absolute; inset: 0; pointer-events: none; background: var(--vignette); }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="corner top"><span id="server">DESPAIR SYNDROME</span><span>BOOT SEQ 0x00<span id="seq">000</span></span></div>
+  <div class="corner bottom"><span id="map">ПАЛАТА 78-B · ТЕРМИНАЛ 04</span><span id="clock">00:00:00</span></div>
+  <div class="center">
+    <div class="term">
+      <div class="bar"><span>BOOT // ИСТОРИЯ БОЛЕЗНИ</span><span id="clock2">00:00:00</span></div>
+      <div class="body">
+        <div class="head">
+          <div class="title"><div>DESPAIR SYNDROME.EXE<span class="blink">_</span></div></div>
+          <span class="patient">ПАЦИЕНТ #0071 · HOPE <span id="hope">100</span>%</span>
+        </div>
+        <div class="log" id="log"></div>
+        <div class="ecg">
+          <span class="label" id="ecgLabel">II · 25mm/s</span>
+          <span class="hr" id="hr">HR 72</span>
+          <svg viewBox="0 0 1200 48" preserveAspectRatio="none"><path id="ecgPath" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"></path></svg>
+        </div>
+        <div class="progress"><span class="name">ЗАГРУЗКА</span><span class="cells" id="cells">[]</span><span class="pct" id="pct">0%</span></div>
+        <div class="status" id="status"></div>
+        <div class="foot"><span id="stageText">ПРОТОКОЛ НАДЕЖДЫ: АКТИВЕН</span><span class="key"><span id="pressKey">ОЖИДАЙТЕ</span><span class="blink">_</span></span></div>
+      </div>
+      <div class="scan"></div>
+    </div>
+  </div>
+  <div class="scan"></div>
+  <div class="vignette"></div>
+</div>
+<script>
+// The owner's design, its text and its numbers (despair-loading-1a).
+var LOG = [
+  [0, '> BIOS ПАЛАТЫ v2.07 ................ OK'],
+  [8, '> ПРОВЕРКА ПАМЯТИ: 640K ............ OK'],
+  [18, '> МОНТИРОВАНИЕ /ward/class_78 ...... OK'],
+  [30, '> ЗАГРУЗКА МЕДКАРТ: 16 ПАЦИЕНТОВ ... OK'],
+  [44, '> КАЛИБРОВКА ЭКГ ................... OK'],
+  [58, '> СИНХРОНИЗАЦИЯ ПРОТОКОЛА НАДЕЖДЫ .. OK'],
+  [72, '!! WARNING !! АНОМАЛИЯ В СЕКТОРЕ 0x2BD6', 1],
+  [86, '> ИЗОЛЯЦИЯ ИНФЕКЦИИ ........... НЕУДАЧА', 1],
+  [100, '> DESPAIR_SYNDROME.EXE ЗАПУЩЕН', 1]
+];
+var BEAT = [[0,24],[18,24],[22,20],[26,24],[34,24],[38,6],[42,44],[46,24],[60,24],[66,18],[72,24],[100,24]];
+function ecgPath(flat) {
+  var d = [];
+  for (var i = 0; i < 12; i++) for (var j = 0; j < BEAT.length; j++)
+    d.push((i === 0 && j === 0 ? 'M' : 'L') + (BEAT[j][0] + i * 100) + ' ' + (flat ? 24 : BEAT[j][1]));
+  return d.join(' ');
+}
+var ECG_BEAT = ecgPath(false), ECG_FLAT = ecgPath(true);
+function pad(n, l) { n = String(n); while (n.length < (l || 3)) n = '0' + n; return n; }
+function $(id) { return document.getElementById(id); }
+
+// Garry's Mod's loading screen calls (the files the player still downloads).
+var game = { total: 0, needed: 0, status: '', file: '', real: false };
+window.GameDetails = function (servername, serverurl, mapname) {
+  game.real = true;
+  if (servername) $('server').textContent = servername;
+  if (mapname) $('map').textContent = 'ПАЛАТА ' + mapname.toUpperCase() + ' · ТЕРМИНАЛ 04';
+};
+window.SetFilesTotal = function (total) { game.real = true; game.total = Number(total) || 0; };
+window.SetFilesNeeded = function (needed) { game.real = true; game.needed = Number(needed) || 0; };
+window.DownloadingFile = function (file) { game.real = true; game.file = String(file || ''); };
+window.SetStatusChanged = function (status) { game.real = true; game.status = String(status || ''); };
+
+var t = 0, shown = 0;
+function progress() {
+  if (game.real) {
+    // The real download; without files to fetch it creeps to 95 % until the game takes over.
+    var real = game.total > 0 ? (1 - game.needed / game.total) * 100 : Math.min(95, t * 0.4);
+    shown = Math.max(shown, Math.min(99, Math.floor(real)));
+    return shown;
+  }
+  return Math.min(100, Math.floor((t * 0.8) % 140)); // the design's demo
+}
+
+function render() {
+  var p = progress(), done = p >= 100, infected = p >= 72;
+  var cur = t % 10 < 5;
+  document.body.classList.toggle('infected', infected);
+
+  var vis = LOG.filter(function (l) { return l[0] <= p; }).slice(-7);
+  $('log').innerHTML = '';
+  vis.forEach(function (l, k) {
+    var div = document.createElement('div');
+    if (l[2]) div.className = 'bad';
+    div.textContent = l[1] + (k === vis.length - 1 && cur ? '█' : '');
+    $('log').appendChild(div);
+  });
+
+  var hope = Math.round(100 - p * 0.44);
+  var hr = Math.round(72 + p * 0.62 + (t % 3));
+  $('hope').textContent = hope;
+  $('hr').textContent = done ? '---' : 'HR ' + hr;
+  $('ecgLabel').textContent = done ? 'ASYSTOLE' : 'II · 25mm/s';
+  $('ecgPath').setAttribute('d', done ? ECG_FLAT : ECG_BEAT);
+  $('seq').textContent = pad(p);
+
+  var filled = Math.round(p * 28 / 100);
+  $('cells').textContent = '[' + Array(filled + 1).join('█') + Array(28 - filled + 1).join('░') + ']';
+  $('pct').textContent = p + '%';
+  $('stageText').textContent = done ? 'ПРОТОКОЛ НАДЕЖДЫ: ОТКЛЮЧЁН' : infected ? 'ПРОТОКОЛ НАДЕЖДЫ: ПОД УГРОЗОЙ' : 'ПРОТОКОЛ НАДЕЖДЫ: АКТИВЕН';
+  $('pressKey').textContent = done ? 'НАЖМИТЕ ЛЮБУЮ КЛАВИШУ' : 'ОЖИДАЙТЕ';
+  $('status').textContent = game.file ? '> ' + game.file : (game.status ? '> ' + game.status : '');
+
+  var clock = new Date().toTimeString().slice(0, 8);
+  $('clock').textContent = clock;
+  $('clock2').textContent = (done ? 'ERR_0x2BD6 · ' : '') + clock;
+  $('ecgPath').style.color = getComputedStyle(document.body).getPropertyValue('--tone');
+}
+
+function fit() {
+  $('stage').style.transform = 'scale(' + Math.min(innerWidth / 960, innerHeight / 540) + ')';
+}
+addEventListener('resize', fit);
+fit();
+render();
+setInterval(function () { t++; render(); }, 100);
+</script>
+</body>
+</html>
